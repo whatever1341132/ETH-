@@ -1,0 +1,32 @@
+import requests
+import re
+from mnemonic import Mnemonic
+
+def extract_mnemonics(text):
+    pattern = r'\b(?:\w+\s){11,23}\w+\b'
+    return re.findall(pattern, text)
+
+def validate_seed_phrases(phrases):
+    mnemo = Mnemonic("english")
+    return [p for p in phrases if mnemo.check(p)]
+
+def format_valid_phrases(valid_phrases):
+    return [{"seed_phrase": p, "status": "valid"} for p in valid_phrases]
+
+# Step 1: Download the raw file from GitHub
+url = "https://raw.githubusercontent.com/whatever1341132/ETH-/main/.github/workflows/pages.yml"
+response = requests.get(url)
+text = response.text
+
+# Step 2: Extract mnemonics
+phrases = extract_mnemonics(text)
+
+# Step 3: Validate mnemonics
+valid_phrases = validate_seed_phrases(phrases)
+
+# Step 4: Format results
+results = format_valid_phrases(valid_phrases)
+
+# Step 5: Output results
+import json
+print(json.dumps(results, indent=2))
